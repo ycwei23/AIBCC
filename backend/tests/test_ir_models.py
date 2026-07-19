@@ -1,5 +1,6 @@
 import pytest
-from app.models.ir import BuildingElement, Rule, Violation, GraphEdge, AgentTrace
+
+from app.models.ir import AgentTrace, BuildingElement, GraphEdge, Rule, Violation
 
 
 def test_building_element_valid():
