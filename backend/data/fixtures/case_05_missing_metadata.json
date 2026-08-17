@@ -1,0 +1,29 @@
+{
+  "fixture_key": "case_05_missing_metadata",
+  "description": "元件皆有幾何尺寸，但完全缺少 scope metadata（building_use/is_evacuation_floor/both_sides_habitable/floor_index），所有可套用規則應誠實回報 insufficient_data，而非猜測 pass/fail",
+  "layout_blocks": [
+    {"block_id": "dim_exit_1", "page": 1, "bbox": [50, 195, 90, 200], "block_type": "dimension", "text": "1500mm", "ocr_confidence": 0.95, "dimension_value_mm": 1500}
+  ],
+  "vlm_detections": [
+    {"detection_id": "exit_001", "page": 1, "bbox": [50, 200, 90, 230], "label": "exit", "confidence": 0.95},
+    {"detection_id": "corridor_A_01", "page": 1, "bbox": [100, 200, 400, 260], "label": "room", "confidence": 0.9},
+    {"detection_id": "stair_001", "page": 1, "bbox": [500, 300, 560, 350], "label": "door", "confidence": 0.9},
+    {"detection_id": "stair_002", "page": 1, "bbox": [560, 300, 600, 350], "label": "door", "confidence": 0.9},
+    {"detection_id": "room_001", "page": 1, "bbox": [200, 400, 300, 500], "label": "room", "confidence": 0.88}
+  ],
+  "vlm_relations": [],
+  "element_geometry_overrides": {
+    "exit_001": {"width_mm": 1500, "height_mm": 2000},
+    "corridor_A_01": {"width_mm": 1800},
+    "stair_001": {},
+    "stair_002": {},
+    "room_001": {"walking_distance_m": 25}
+  },
+  "element_type_overrides": {
+    "exit_001": "exit_entrance",
+    "corridor_A_01": "corridor",
+    "stair_001": "stair",
+    "stair_002": "stair"
+  },
+  "metadata_by_element_id": {}
+}

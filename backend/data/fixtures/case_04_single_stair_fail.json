@@ -1,0 +1,26 @@
+{
+  "fixture_key": "case_04_single_stair_fail",
+  "description": "10 樓僅設置 1 座直通樓梯，低於 MVP-STAIR-COUNT-95-FLOOR8 門檻 2 座，判定 fail",
+  "layout_blocks": [],
+  "vlm_detections": [
+    {"detection_id": "exit_001", "page": 1, "bbox": [50, 200, 90, 230], "label": "exit", "confidence": 0.95},
+    {"detection_id": "corridor_A_01", "page": 1, "bbox": [100, 200, 400, 260], "label": "room", "confidence": 0.9},
+    {"detection_id": "stair_001", "page": 1, "bbox": [500, 300, 560, 350], "label": "door", "confidence": 0.9}
+  ],
+  "vlm_relations": [],
+  "element_geometry_overrides": {
+    "exit_001": {"width_mm": 1500, "height_mm": 2000},
+    "corridor_A_01": {"width_mm": 1800},
+    "stair_001": {}
+  },
+  "element_type_overrides": {
+    "exit_001": "exit_entrance",
+    "corridor_A_01": "corridor",
+    "stair_001": "stair"
+  },
+  "metadata_by_element_id": {
+    "exit_001": {"is_evacuation_floor": true, "building_use": "B-2"},
+    "corridor_A_01": {"both_sides_habitable": false, "building_use": "B-2"},
+    "stair_001": {"floor_index": 10}
+  }
+}

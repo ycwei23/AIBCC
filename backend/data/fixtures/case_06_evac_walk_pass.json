@@ -1,0 +1,18 @@
+{
+  "fixture_key": "case_06_evac_walk_pass",
+  "description": "居室步行至避難層出口距離 25m，未超過 MVP-EVAC-WALK-93-ABD1（A/B-1/B-2/B-3/D-1 類）門檻 30m，判定 pass",
+  "layout_blocks": [
+    {"block_id": "dim_room_1", "page": 1, "bbox": [200, 395, 240, 400], "block_type": "dimension", "text": "25m", "ocr_confidence": 0.9, "dimension_value_mm": 25000}
+  ],
+  "vlm_detections": [
+    {"detection_id": "room_001", "page": 1, "bbox": [200, 400, 300, 500], "label": "room", "confidence": 0.88}
+  ],
+  "vlm_relations": [],
+  "element_geometry_overrides": {
+    "room_001": {"walking_distance_m": 25}
+  },
+  "element_type_overrides": {},
+  "metadata_by_element_id": {
+    "room_001": {"building_use": "B-2", "is_evacuation_floor": false}
+  }
+}

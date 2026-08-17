@@ -1,0 +1,26 @@
+{
+  "fixture_key": "case_09_multi_floor",
+  "description": "同一份圖說跨 page=1（8樓，2座樓梯）與 page=8（10樓，僅1座樓梯），MVP-STAIR-COUNT-95-FLOOR8 以 page 為樓層代理分組獨立判定：page=1 應 pass，page=8 應 fail",
+  "layout_blocks": [],
+  "vlm_detections": [
+    {"detection_id": "stair_p1_001", "page": 1, "bbox": [500, 300, 560, 350], "label": "door", "confidence": 0.9},
+    {"detection_id": "stair_p1_002", "page": 1, "bbox": [560, 300, 600, 350], "label": "door", "confidence": 0.9},
+    {"detection_id": "stair_p8_001", "page": 8, "bbox": [500, 300, 560, 350], "label": "door", "confidence": 0.9}
+  ],
+  "vlm_relations": [],
+  "element_geometry_overrides": {
+    "stair_p1_001": {},
+    "stair_p1_002": {},
+    "stair_p8_001": {}
+  },
+  "element_type_overrides": {
+    "stair_p1_001": "stair",
+    "stair_p1_002": "stair",
+    "stair_p8_001": "stair"
+  },
+  "metadata_by_element_id": {
+    "stair_p1_001": {"floor_index": 8},
+    "stair_p1_002": {"floor_index": 8},
+    "stair_p8_001": {"floor_index": 10}
+  }
+}

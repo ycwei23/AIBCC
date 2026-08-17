@@ -1,0 +1,10 @@
+{
+  "fixture_key": "case_10_empty",
+  "description": "空圖說：無任何元件，管線應能完整跑完並回報 0 個元件、0 筆違規（驗證空路徑不拋例外）",
+  "layout_blocks": [],
+  "vlm_detections": [],
+  "vlm_relations": [],
+  "element_geometry_overrides": {},
+  "element_type_overrides": {},
+  "metadata_by_element_id": {}
+}

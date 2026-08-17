@@ -1,0 +1,32 @@
+{
+  "fixture_key": "case_03_narrow_exit_fail",
+  "description": "避難層出入口寬度 1000mm，低於 MVP-EXIT-WIDTH-90 門檻 1200mm，判定 fail",
+  "layout_blocks": [
+    {"block_id": "dim_exit_1", "page": 1, "bbox": [50, 195, 80, 200], "block_type": "dimension", "text": "1000mm", "ocr_confidence": 0.92, "dimension_value_mm": 1000}
+  ],
+  "vlm_detections": [
+    {"detection_id": "exit_001", "page": 1, "bbox": [50, 200, 80, 230], "label": "exit", "confidence": 0.95},
+    {"detection_id": "corridor_A_01", "page": 1, "bbox": [100, 200, 400, 260], "label": "room", "confidence": 0.9},
+    {"detection_id": "stair_001", "page": 1, "bbox": [500, 300, 560, 350], "label": "door", "confidence": 0.9},
+    {"detection_id": "stair_002", "page": 1, "bbox": [560, 300, 600, 350], "label": "door", "confidence": 0.9}
+  ],
+  "vlm_relations": [],
+  "element_geometry_overrides": {
+    "exit_001": {"width_mm": 1000, "height_mm": 2000},
+    "corridor_A_01": {"width_mm": 1800},
+    "stair_001": {},
+    "stair_002": {}
+  },
+  "element_type_overrides": {
+    "exit_001": "exit_entrance",
+    "corridor_A_01": "corridor",
+    "stair_001": "stair",
+    "stair_002": "stair"
+  },
+  "metadata_by_element_id": {
+    "exit_001": {"is_evacuation_floor": true, "building_use": "B-2"},
+    "corridor_A_01": {"both_sides_habitable": false, "building_use": "B-2"},
+    "stair_001": {"floor_index": 10},
+    "stair_002": {"floor_index": 10}
+  }
+}

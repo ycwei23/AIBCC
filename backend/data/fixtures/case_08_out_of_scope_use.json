@@ -1,0 +1,20 @@
+{
+  "fixture_key": "case_08_out_of_scope_use",
+  "description": "走廊所屬建築物使用類組為 A 類（非 D-3/D-4/D-5），MVP-CORRIDOR-WIDTH-92-D34-BOTH/OTHER 之 building_use scope 不含 A，應被排除、不產生任何違規（而非 insufficient_data）；一般走廊門檻規則（DEFAULT-OTHER）不受影響，仍可正常判定",
+  "layout_blocks": [
+    {"block_id": "dim_corridor_1", "page": 1, "bbox": [100, 260, 140, 265], "block_type": "dimension", "text": "2000mm", "ocr_confidence": 0.93, "dimension_value_mm": 2000}
+  ],
+  "vlm_detections": [
+    {"detection_id": "corridor_C_01", "page": 1, "bbox": [100, 200, 400, 260], "label": "room", "confidence": 0.9}
+  ],
+  "vlm_relations": [],
+  "element_geometry_overrides": {
+    "corridor_C_01": {"width_mm": 2000}
+  },
+  "element_type_overrides": {
+    "corridor_C_01": "corridor"
+  },
+  "metadata_by_element_id": {
+    "corridor_C_01": {"both_sides_habitable": false, "building_use": "A"}
+  }
+}
