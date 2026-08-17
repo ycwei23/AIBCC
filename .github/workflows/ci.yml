@@ -23,6 +23,20 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: aibcc
+          POSTGRES_PASSWORD: aibcc
+          POSTGRES_DB: aibcc
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -30,8 +44,14 @@ jobs:
           python-version: "3.11"
       - name: Install dependencies
         run: pip install -r backend/requirements-dev.txt
+      - name: Install psql client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Run migrations
+        run: PGPASSWORD=aibcc psql -h localhost -U aibcc -d aibcc -f backend/migrations/init.sql
       - name: Run pytest
         working-directory: backend
+        env:
+          DATABASE_URL: postgresql://aibcc:aibcc@localhost:5432/aibcc
         run: python -m pytest tests/ -v --tb=short
 
   build:

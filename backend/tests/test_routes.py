@@ -46,13 +46,14 @@ def test_upload_file_stub():
 
 
 # GET /v1/analyses/{id}
-def test_get_analysis_stub():
+@pytest.mark.integration
+def test_get_analysis_unknown_id_returns_not_found_shape():
     analysis_id = str(uuid.uuid4())
     response = client.get(f"/v1/analyses/{analysis_id}")
     assert response.status_code == 200
     data = response.json()
-    assert "status" in data
-    assert "counts" in data
+    assert data["status"] == "not_found"
+    assert data["counts"] == {"violations": 0, "elements": 0}
 
 
 @pytest.mark.integration
@@ -68,11 +69,12 @@ def test_get_analysis_returns_real_status_and_counts():
 
 
 # GET /v1/analyses/{id}/violations
-def test_get_violations_stub():
+@pytest.mark.integration
+def test_get_violations_unknown_id_returns_empty_list():
     analysis_id = str(uuid.uuid4())
     response = client.get(f"/v1/analyses/{analysis_id}/violations")
     assert response.status_code == 200
-    assert isinstance(response.json(), list)
+    assert response.json() == []
 
 
 @pytest.mark.integration
@@ -87,12 +89,14 @@ def test_get_violations_returns_real_fail_status():
 
 
 # GET /v1/analyses/{id}/report
-def test_get_report_stub():
+@pytest.mark.integration
+def test_get_report_unknown_id_returns_not_found_summary():
     analysis_id = str(uuid.uuid4())
     response = client.get(f"/v1/analyses/{analysis_id}/report")
     assert response.status_code == 200
     data = response.json()
-    assert "analysis_id" in data
+    assert data["analysis_id"] == analysis_id
+    assert data["status"] == "not_found"
 
 
 # GET /v1/rules
@@ -103,7 +107,8 @@ def test_get_rules_stub():
 
 
 # POST /v1/analyses/{id}/copilot
-def test_copilot_stub():
+@pytest.mark.integration
+def test_copilot_unknown_analysis_returns_empty_answer_shape():
     analysis_id = str(uuid.uuid4())
     response = client.post(
         f"/v1/analyses/{analysis_id}/copilot",
@@ -111,19 +116,20 @@ def test_copilot_stub():
     )
     assert response.status_code == 200
     data = response.json()
-    assert "answer" in data
-    assert "citations" in data
-    assert "trace_id" in data
+    # Unknown analysis_id is a foreign-key guard clause, not a pipeline run —
+    # copilot returns a clean empty shape instead of hitting the agent state machine.
+    assert data == {"answer": "", "citations": [], "trace_id": None}
 
 
 # GET /v1/analyses/{id}/graph
-def test_get_graph_stub():
+@pytest.mark.integration
+def test_get_graph_unknown_id_returns_empty_graph():
     analysis_id = str(uuid.uuid4())
     response = client.get(f"/v1/analyses/{analysis_id}/graph")
     assert response.status_code == 200
     data = response.json()
-    assert "nodes" in data
-    assert "edges" in data
+    assert data["nodes"] == []
+    assert data["edges"] == []
 
 
 @pytest.mark.integration
@@ -150,10 +156,11 @@ def test_simulate_stub():
 
 
 # GET /v1/agent-traces/{id}
-def test_get_agent_trace_stub():
+@pytest.mark.integration
+def test_get_agent_trace_unknown_id_returns_not_found_status():
     trace_id = str(uuid.uuid4())
     response = client.get(f"/v1/agent-traces/{trace_id}")
     assert response.status_code == 200
     data = response.json()
-    assert "trace_id" in data
-    assert "steps" in data
+    assert data["trace_id"] == trace_id
+    assert data["final_rule_status"] == "not_found"
