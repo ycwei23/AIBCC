@@ -11,6 +11,7 @@ class BuildingElement(BaseModel):
     geometry: dict[str, Any]
     source: str
     confidence: float
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
     @field_validator("confidence")
     @classmethod
@@ -22,6 +23,7 @@ class BuildingElement(BaseModel):
 
 class Rule(BaseModel):
     rule_id: str
+    law_code: str = ""
     law_name: str
     article: str
     version: str
@@ -31,6 +33,7 @@ class Rule(BaseModel):
     threshold: float
     unit: str
     severity: str
+    source_quote: str = ""
 
 
 class Violation(BaseModel):
