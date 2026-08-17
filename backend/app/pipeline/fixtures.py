@@ -24,9 +24,9 @@ def list_fixture_keys() -> list[str]:
 
 
 def load_fixture(fixture_key: str) -> FixtureBundle:
-    path = FIXTURES_DIR / f"{fixture_key}.json"
-    if not path.exists():
+    if fixture_key not in set(list_fixture_keys()):
         raise FileNotFoundError(f"no fixture named {fixture_key!r} in {FIXTURES_DIR}")
+    path = FIXTURES_DIR / f"{fixture_key}.json"
     with path.open(encoding="utf-8") as f:
         raw = json.load(f)
     return FixtureBundle(**raw)

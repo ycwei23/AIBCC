@@ -44,12 +44,16 @@ def get_report(analysis_id: str):
     row = analysis_repo.get_analysis_run(engine, analysis_id)
     violations = analysis_repo.get_violations(engine, analysis_id)
     fail_count = sum(1 for v in violations if v["status"] == "fail")
+    insufficient_count = sum(1 for v in violations if v["status"] == "insufficient_data")
     status = row["status"] if row else "not_found"
     return {
         "analysis_id": analysis_id,
         "report_url": None,
         "status": status,
-        "summary": f"{len(violations)} 條規則檢查，{fail_count} 條不符合",
+        "summary": (
+            f"{len(violations)} 條規則檢查，{fail_count} 條不符合，"
+            f"{insufficient_count} 條資料不足無法判定"
+        ),
     }
 
 

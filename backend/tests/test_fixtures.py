@@ -18,3 +18,9 @@ def test_load_fixture_unknown_key_raises():
     import pytest
     with pytest.raises(FileNotFoundError):
         load_fixture("does_not_exist")
+
+
+def test_load_fixture_path_traversal_key_raises_not_reads_outside_dir():
+    import pytest
+    with pytest.raises(FileNotFoundError):
+        load_fixture("../rules/mvp_rules_active_v0")
