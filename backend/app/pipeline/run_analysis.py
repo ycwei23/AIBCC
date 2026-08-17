@@ -7,6 +7,7 @@ from app.graph.builder import GraphNodeData
 from app.ingest.document_ai_adapter import layout_blocks_to_building_elements
 from app.ingest.vlm_adapter import vlm_detections_to_building_elements, vlm_relations_to_graph_edges
 from app.models.ir import BuildingElement
+from app.monitoring import pipeline_metrics
 from app.pipeline.fixtures import load_fixture
 from app.rules.engine import run_rules
 from app.rules.geometry_validator import validate_elements
@@ -18,8 +19,12 @@ MVP_BUNDLE_PATH = Path(__file__).resolve().parents[2] / "data" / "rules" / "mvp_
 def run_analysis(engine: Engine, analysis_run_id: str, fixture_key: str) -> None:
     try:
         _run(engine, analysis_run_id, fixture_key)
+        pipeline_metrics.record_status("completed")
     except Exception:
         analysis_repo.update_analysis_status(engine, analysis_run_id, "failed")
+        pipeline_metrics.record_status("failed")
+        # Deliberately does not re-raise: callers (e.g. background task runners) treat
+        # a "failed" status row as the terminal outcome, not an unhandled exception.
 
 
 def _run(engine: Engine, analysis_run_id: str, fixture_key: str) -> None:
