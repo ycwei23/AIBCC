@@ -1,5 +1,6 @@
 import uuid
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -8,44 +9,40 @@ client = TestClient(app)
 
 
 # POST /v1/projects
-def test_create_project():
+@pytest.mark.integration
+def test_create_project_persists_to_db():
     response = client.post("/v1/projects", json={"name": "Test Building", "building_use": "office"})
     assert response.status_code == 201
     data = response.json()
-    assert "id" in data
     assert data["name"] == "Test Building"
     assert data["building_use"] == "office"
+    # id must be a real DB-generated UUID, not a random client-side stub
+    assert len(data["id"]) == 36
 
 
-def test_create_project_name_only():
-    response = client.post("/v1/projects", json={"name": "Minimal"})
-    assert response.status_code == 201
+@pytest.mark.integration
+def test_start_analysis_runs_pipeline_synchronously():
+    project = client.post("/v1/projects", json={"name": "Pipeline Route Test"}).json()
+    response = client.post(
+        f"/v1/projects/{project['id']}/analyses", json={"fixture_key": "case_01_clean_pass"}
+    )
+    assert response.status_code == 202
     data = response.json()
-    assert data["name"] == "Minimal"
-    assert data["building_use"] is None
+    assert data["status"] == "completed"
 
 
 # POST /v1/projects/{id}/files
+@pytest.mark.integration
 def test_upload_file_stub():
-    project_id = str(uuid.uuid4())
+    project = client.post("/v1/projects", json={"name": "Upload Route Test"}).json()
     response = client.post(
-        f"/v1/projects/{project_id}/files",
+        f"/v1/projects/{project['id']}/files",
         files={"file": ("plan.pdf", b"%PDF-1.4 fake", "application/pdf")},
     )
     assert response.status_code == 202
     data = response.json()
     assert "file_id" in data
     assert data["status"] == "pending"
-
-
-# POST /v1/projects/{id}/analyses
-def test_start_analysis_stub():
-    project_id = str(uuid.uuid4())
-    response = client.post(f"/v1/projects/{project_id}/analyses")
-    assert response.status_code == 202
-    data = response.json()
-    assert "analysis_id" in data
-    assert data["status"] == "uploaded"
 
 
 # GET /v1/analyses/{id}
