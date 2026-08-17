@@ -55,12 +55,35 @@ def test_get_analysis_stub():
     assert "counts" in data
 
 
+@pytest.mark.integration
+def test_get_analysis_returns_real_status_and_counts():
+    project = client.post("/v1/projects", json={"name": "Get Analysis Test"}).json()
+    started = client.post(
+        f"/v1/projects/{project['id']}/analyses", json={"fixture_key": "case_02_narrow_corridor_fail"}
+    ).json()
+    response = client.get(f"/v1/analyses/{started['analysis_id']}")
+    data = response.json()
+    assert data["status"] == "completed"
+    assert data["counts"]["violations"] >= 1
+
+
 # GET /v1/analyses/{id}/violations
 def test_get_violations_stub():
     analysis_id = str(uuid.uuid4())
     response = client.get(f"/v1/analyses/{analysis_id}/violations")
     assert response.status_code == 200
     assert isinstance(response.json(), list)
+
+
+@pytest.mark.integration
+def test_get_violations_returns_real_fail_status():
+    project = client.post("/v1/projects", json={"name": "Get Violations Test"}).json()
+    started = client.post(
+        f"/v1/projects/{project['id']}/analyses", json={"fixture_key": "case_02_narrow_corridor_fail"}
+    ).json()
+    response = client.get(f"/v1/analyses/{started['analysis_id']}/violations")
+    violations = response.json()
+    assert any(v["rule_id"] == "MVP-CORRIDOR-WIDTH-92-DEFAULT-OTHER" and v["status"] == "fail" for v in violations)
 
 
 # GET /v1/analyses/{id}/report
@@ -101,6 +124,17 @@ def test_get_graph_stub():
     data = response.json()
     assert "nodes" in data
     assert "edges" in data
+
+
+@pytest.mark.integration
+def test_get_graph_returns_real_nodes():
+    project = client.post("/v1/projects", json={"name": "Get Graph Test"}).json()
+    started = client.post(
+        f"/v1/projects/{project['id']}/analyses", json={"fixture_key": "case_01_clean_pass"}
+    ).json()
+    response = client.get(f"/v1/analyses/{started['analysis_id']}/graph")
+    data = response.json()
+    assert len(data["nodes"]) > 0
 
 
 # POST /v1/analyses/{id}/simulate

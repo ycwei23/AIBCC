@@ -4,6 +4,9 @@ from typing import Any
 from fastapi import APIRouter
 from pydantic import BaseModel
 
+from app.db import analysis_repo
+from app.db.session import engine
+
 router = APIRouter(prefix="/v1", tags=["analyses"])
 
 
@@ -17,21 +20,35 @@ class SimulateRequest(BaseModel):
 
 @router.get("/analyses/{analysis_id}")
 def get_analysis(analysis_id: str):
+    row = analysis_repo.get_analysis_run(engine, analysis_id)
+    if row is None:
+        return {"analysis_id": analysis_id, "status": "not_found", "counts": {"violations": 0, "elements": 0}}
+    violations = analysis_repo.get_violations(engine, analysis_id)
+    nodes, _edges = analysis_repo.get_graph(engine, analysis_id)
     return {
         "analysis_id": analysis_id,
-        "status": "completed",
-        "counts": {"violations": 0, "elements": 0},
+        "status": row["status"],
+        "counts": {"violations": len(violations), "elements": len(nodes)},
     }
 
 
 @router.get("/analyses/{analysis_id}/violations")
 def get_violations(analysis_id: str):
-    return []
+    return analysis_repo.get_violations(engine, analysis_id)
 
 
 @router.get("/analyses/{analysis_id}/report")
 def get_report(analysis_id: str):
-    return {"analysis_id": analysis_id, "report_url": None, "status": "stub"}
+    row = analysis_repo.get_analysis_run(engine, analysis_id)
+    violations = analysis_repo.get_violations(engine, analysis_id)
+    fail_count = sum(1 for v in violations if v["status"] == "fail")
+    status = row["status"] if row else "not_found"
+    return {
+        "analysis_id": analysis_id,
+        "report_url": None,
+        "status": status,
+        "summary": f"{len(violations)} 條規則檢查，{fail_count} 條不符合",
+    }
 
 
 @router.post("/analyses/{analysis_id}/copilot")
@@ -45,7 +62,8 @@ def copilot(analysis_id: str, body: CopilotRequest):
 
 @router.get("/analyses/{analysis_id}/graph")
 def get_graph(analysis_id: str):
-    return {"nodes": [], "edges": [], "paths": []}
+    nodes, edges = analysis_repo.get_graph(engine, analysis_id)
+    return {"nodes": nodes, "edges": edges, "paths": []}
 
 
 @router.post("/analyses/{analysis_id}/simulate")
