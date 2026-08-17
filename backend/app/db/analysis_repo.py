@@ -195,3 +195,53 @@ def get_graph(engine: Engine, analysis_run_id: str) -> tuple[list[dict], list[di
             )
         ]
         return nodes, edges
+
+
+def save_agent_run(
+    engine: Engine, analysis_run_id: str, question: str, status: str, answer: str | None, steps: list
+) -> str:
+    with engine.begin() as conn:
+        row = conn.execute(
+            text(
+                "INSERT INTO agent_runs (analysis_run_id, question, status, answer) "
+                "VALUES (:run_id, :question, :status, :answer) RETURNING id"
+            ),
+            {"run_id": analysis_run_id, "question": question, "status": status, "answer": answer},
+        ).first()
+        agent_run_id = str(row.id)
+        for step in steps:
+            conn.execute(
+                text(
+                    "INSERT INTO agent_steps (agent_run_id, step_order, tool_name, tool_input, tool_output) "
+                    "VALUES (:agent_run_id, :step_order, :tool_name, :tool_input, :tool_output)"
+                ),
+                {
+                    "agent_run_id": agent_run_id,
+                    "step_order": step.step_order,
+                    "tool_name": step.tool_name,
+                    "tool_input": json.dumps(step.tool_input, default=str),
+                    "tool_output": json.dumps(step.tool_output, default=str),
+                },
+            )
+        return agent_run_id
+
+
+def get_agent_run(engine: Engine, agent_run_id: str) -> dict | None:
+    with engine.connect() as conn:
+        run_row = conn.execute(text("SELECT * FROM agent_runs WHERE id = :id"), {"id": agent_run_id}).first()
+        if run_row is None:
+            return None
+        steps = [
+            _row_to_dict(row)
+            for row in conn.execute(
+                text("SELECT * FROM agent_steps WHERE agent_run_id = :id ORDER BY step_order"),
+                {"id": agent_run_id},
+            )
+        ]
+        return {
+            "trace_id": agent_run_id,
+            "question": run_row.question,
+            "steps": steps,
+            "evidence_ids": [],
+            "final_rule_status": run_row.status,
+        }
