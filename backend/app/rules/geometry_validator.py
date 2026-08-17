@@ -17,6 +17,11 @@ def validate_elements(elements: list[BuildingElement]) -> tuple[list[BuildingEle
 
 
 def _validate_one(element: BuildingElement) -> GeometryError | None:
+    if len(element.bbox) != 4:
+        return GeometryError(
+            element_id=element.id, error_type="malformed_bbox",
+            message=f"bbox must have exactly 4 values, got {len(element.bbox)}",
+        )
     x_min, y_min, x_max, y_max = element.bbox
     if (x_max - x_min) == 0 or (y_max - y_min) == 0:
         return GeometryError(

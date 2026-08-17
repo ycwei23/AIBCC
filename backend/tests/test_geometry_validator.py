@@ -44,3 +44,10 @@ def test_zero_area_bbox_is_rejected():
     valid, errors = validate_elements([element])
     assert valid == []
     assert errors[0].error_type == "zero_area_bbox"
+
+
+def test_malformed_bbox_length_is_rejected():
+    element = _element(bbox=[0.0, 0.0, 10.0])
+    valid, errors = validate_elements([element])
+    assert valid == []
+    assert errors[0].error_type == "malformed_bbox"
