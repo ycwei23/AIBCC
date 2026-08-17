@@ -5,7 +5,7 @@ from sqlalchemy import text
 from sqlalchemy.engine import Engine
 
 from app.graph.builder import GraphEdgeData, GraphNodeData
-from app.models.ir import BuildingElement, Violation
+from app.models.ir import BuildingElement, Rule, Violation
 
 
 def _row_to_dict(row) -> dict:
@@ -134,6 +134,32 @@ def save_violations(engine: Engine, analysis_run_id: str, violations: list[Viola
                     "highlight": json.dumps(v.highlight),
                     "evidence": v.evidence,
                     "suggestion": v.suggestion,
+                },
+            )
+
+
+def upsert_rules(engine: Engine, rules: list[Rule]) -> None:
+    with engine.begin() as conn:
+        for rule in rules:
+            conn.execute(
+                text(
+                    "INSERT INTO rules (rule_id, law_name, article, version, scope, target, operator, "
+                    "threshold, unit, severity, status) "
+                    "VALUES (:rule_id, :law_name, :article, :version, :scope, :target, :operator, "
+                    ":threshold, :unit, :severity, 'active') "
+                    "ON CONFLICT (rule_id) DO NOTHING"
+                ),
+                {
+                    "rule_id": rule.rule_id,
+                    "law_name": rule.law_name,
+                    "article": rule.article,
+                    "version": rule.version,
+                    "scope": json.dumps(rule.scope),
+                    "target": rule.target,
+                    "operator": rule.operator,
+                    "threshold": rule.threshold,
+                    "unit": rule.unit,
+                    "severity": rule.severity,
                 },
             )
 
